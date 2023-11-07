@@ -1,20 +1,37 @@
 import React from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, GestureResponderEvent, StyleProp, ViewStyle } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet, StyleProp, ViewStyle, TouchableNativeFeedback, Platform } from 'react-native';
 
 interface Props {
     text: string
-    action: ((event: GestureResponderEvent) => void),
+    action: (() => void),
     style?: StyleProp<ViewStyle>
 }
 
 export const Fab = ({ text, action, style }: Props) => {
-    return (
-        <TouchableOpacity style={ style } onPress={ action } >
-            <View style={ styles.fab }>
-                <Text style={ styles.fabText }>{ text }</Text>
+
+    const ios = () => {
+        return (
+            <TouchableOpacity style={ style } onPress={ action } >
+                <View style={ styles.fab }>
+                    <Text style={ styles.fabText }>{ text }</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    };
+
+    const android = () => {
+        return (
+            <View style={ style }>
+                <TouchableNativeFeedback background={ TouchableNativeFeedback.Ripple('#0F5DA0', true, 30) } onPress={ action } >
+                    <View style={ styles.fab }>
+                        <Text style={ styles.fabText }>{ text }</Text>
+                    </View>
+                </TouchableNativeFeedback>
             </View>
-        </TouchableOpacity>
-    );
+        );
+    };
+
+    return (Platform.OS === 'ios') ? ios() : android();
 };
 
 const styles = StyleSheet.create({
@@ -24,6 +41,15 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 5,
+        },
+        shadowOpacity: 0.34,
+        shadowRadius: 6.27,
+
+        elevation: 10,
     },
     fabText: {
         color: 'white',
